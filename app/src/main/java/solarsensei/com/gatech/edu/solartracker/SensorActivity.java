@@ -18,7 +18,12 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private TextView mTempView;
     private TextView mLightView;
     private TextView mHumidityView;
-    private  TextView mMagneticView;
+    private TextView mMagneticView;
+    private TextView azimuthView;
+    private TextView pitchView;
+    private TextView rollView;
+    private float[] mRotationMatrix = new float[9];
+    private float[] mOrientationValues = new float[3];
 
 
 
@@ -29,9 +34,13 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private Sensor mTemperature;
     private Sensor mLight;
     private Sensor mRelativeHumidity;
-
-
     private Sensor mMagneticField;
+
+
+    //motion sensors
+    private Sensor mRotation;
+
+
 
 
 
@@ -45,6 +54,10 @@ public class SensorActivity extends Activity implements SensorEventListener {
         mLightView = (TextView) findViewById(R.id.lightReading);
         mHumidityView = (TextView) findViewById(R.id.rHumidity);
         mMagneticView = (TextView) findViewById(R.id.magneticField);
+        azimuthView = (TextView) findViewById(R.id.azimuth);
+        pitchView = (TextView) findViewById(R.id.pitch);
+        rollView = (TextView) findViewById(R.id.roll);
+
 
 
 
@@ -58,6 +71,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
         mRelativeHumidity = mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
 
         mMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        mRotation = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
 
 
@@ -75,19 +89,26 @@ public class SensorActivity extends Activity implements SensorEventListener {
         try {
             switch (event.sensor.getType()) {
                 case Sensor.TYPE_PRESSURE:
-                    mPressureView.setText(String.valueOf(event.values[0]) + "mbar");
+                    mPressureView.setText(String.format(getString(R.string.displayResult), event.values[0], "mbars"));
                     break;
                 case Sensor.TYPE_AMBIENT_TEMPERATURE:
-                    mTempView.setText(String.valueOf(event.values[0]) + "°C");
+                    mTempView.setText(String.format(getString(R.string.displayResult), event.values[0], "°C"));
                     break;
                 case Sensor.TYPE_LIGHT:
-                    mLightView.setText(String.valueOf(event.values[0]) + "lx");
+                    mLightView.setText(String.format(getString(R.string.displayResult), event.values[0], "°lx"));
                     break;
                 case Sensor.TYPE_RELATIVE_HUMIDITY:
-                    mHumidityView.setText(String.valueOf(event.values[0]) + "%");
+                    mHumidityView.setText(String.format(getString(R.string.displayResult), event.values[0], "°%"));
                     break;
                 case Sensor.TYPE_MAGNETIC_FIELD:
-                    mMagneticView.setText(String.valueOf(event.values[0]) + "μT");
+                    mMagneticView.setText(String.format(getString(R.string.displayResult), event.values[0], "μT"));
+                    break;
+                case Sensor.TYPE_ROTATION_VECTOR:
+                    SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
+                    SensorManager.getOrientation(mRotationMatrix, mOrientationValues);
+                    azimuthView.setText(String.format(getString(R.string.displayResult), mOrientationValues[0], "°"));
+                    pitchView.setText(String.format(getString(R.string.displayResult), mOrientationValues[1], "°"));
+                    rollView.setText(String.format(getString(R.string.displayResult), mOrientationValues[2], "°"));
                     break;
                 default:
                     break;
@@ -107,6 +128,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
         mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mRelativeHumidity, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mMagneticField, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mRotation, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
