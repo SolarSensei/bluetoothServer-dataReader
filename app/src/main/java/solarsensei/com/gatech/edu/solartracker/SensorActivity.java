@@ -1,18 +1,18 @@
 package solarsensei.com.gatech.edu.solartracker;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 /**
  * Created by timothybaba on 5/19/17.
  */
-public class SensorActivity extends Activity implements SensorEventListener {
+public class SensorActivity extends AppCompatActivity implements SensorEventListener {
 
     private TextView mPressureView;
     private TextView mTempView;
@@ -25,8 +25,6 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private float[] mRotationMatrix = new float[9];
     private float[] mOrientationValues = new float[3];
 
-
-
     private SensorManager mSensorManager;
 
     //Environmental sensors
@@ -36,13 +34,8 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private Sensor mRelativeHumidity;
     private Sensor mMagneticField;
 
-
     //motion sensors
     private Sensor mRotation;
-
-
-
-
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -59,8 +52,6 @@ public class SensorActivity extends Activity implements SensorEventListener {
         rollView = (TextView) findViewById(R.id.roll);
 
 
-
-
         // Gets an instance of the sensor service, and uses that to get an instance of
         // a particular sensor.
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -72,9 +63,6 @@ public class SensorActivity extends Activity implements SensorEventListener {
 
         mMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         mRotation = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-
-
-
     }
 
     @Override
@@ -98,7 +86,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
                     mLightView.setText(String.format(getString(R.string.displayResult), event.values[0], "°lx"));
                     break;
                 case Sensor.TYPE_RELATIVE_HUMIDITY:
-                    mHumidityView.setText(String.format(getString(R.string.displayResult), event.values[0], "°%"));
+                    mHumidityView.setText(String.format(getString(R.string.displayResult), event.values[0], "%"));
                     break;
                 case Sensor.TYPE_MAGNETIC_FIELD:
                     mMagneticView.setText(String.format(getString(R.string.displayResult), event.values[0], "μT"));
