@@ -94,9 +94,9 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 case Sensor.TYPE_ROTATION_VECTOR:
                     SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
                     SensorManager.getOrientation(mRotationMatrix, mOrientationValues);
-                    azimuthView.setText(String.format(getString(R.string.displayResult), mOrientationValues[0], "°"));
-                    pitchView.setText(String.format(getString(R.string.displayResult), mOrientationValues[1], "°"));
-                    rollView.setText(String.format(getString(R.string.displayResult), mOrientationValues[2], "°"));
+                    azimuthView.setText(String.format(getString(R.string.displayResult), Math.toDegrees(mOrientationValues[0]), "°"));
+                    pitchView.setText(String.format(getString(R.string.displayResult), Math.toDegrees(mOrientationValues[1]), "°"));
+                    rollView.setText(String.format(getString(R.string.displayResult), Math.toDegrees(mOrientationValues[2]), "°"));
                     break;
                 default:
                     break;

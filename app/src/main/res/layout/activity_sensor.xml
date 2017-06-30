@@ -134,7 +134,7 @@
             android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Angle Of Rotation about z-axis (azimuth): " />
+            android:text="Azimuth angle:" />
 
         <TextView
             android:id="@+id/azimuth"
@@ -156,7 +156,7 @@
             android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Angle of rotation about x-axis (pitch): " />
+            android:text="Pitch angle: " />
 
         <TextView
             android:id="@+id/pitch"
@@ -178,7 +178,7 @@
             android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Angle of rotation about y-axis (roll): " />
+            android:text="Roll angle: " />
 
         <TextView
             android:id="@+id/roll"
