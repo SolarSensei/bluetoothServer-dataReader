@@ -173,6 +173,19 @@ public class SensorActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        try
+        {
+            //Don't leave Bluetooth sockets open when leaving activity
+            btServerSocket.close();
+        } catch (IOException e2) {
+            //insert code to deal with this
+        }
+    }
+
     private void manageMyConnectedSocket(BluetoothSocket btSocket) {
         mConnectedThread = new ConnectedThread(btSocket);
         mConnectedThread.start();
