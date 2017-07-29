@@ -3,6 +3,7 @@ package solarsensei.com.gatech.edu.solartracker;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by timothybaba on 5/19/17.
@@ -69,7 +71,14 @@ public class SensorActivity extends AppCompatActivity {
 
     Handler bluetoothIn;
     final int handlerState = 0;
+    private BluetoothServerSocket btServerSocket = null;
     private StringBuilder recDataString = new StringBuilder();
+
+    private BluetoothAdapter mBtAdapter;
+
+    private ConnectedThread mConnectedThread;
+
+    private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -86,6 +95,42 @@ public class SensorActivity extends AppCompatActivity {
         rollView = (TextView) findViewById(R.id.roll);
         mButton = (Button) findViewById(R.id.startPairing);
         dataView = (TextView) findViewById(R.id.data);
+
+
+        BluetoothServerSocket tmp = null;
+        try {
+            // MY_UUID is the app's UUID string, also used by the client code.
+            tmp = mBtAdapter.listenUsingRfcommWithServiceRecord("SecureConnection", BTMODULEUUID);
+        } catch (IOException e) {
+           // Log.e(TAG, "Socket's listen() method failed", e);
+        }
+        btServerSocket = tmp;
+
+        BluetoothSocket btSocket = null;
+        // Keep listening until exception occurs or a socket is returned.
+        while (true) {
+            try {
+                btSocket = btServerSocket.accept();
+            } catch (IOException e) {
+               // Log.e(TAG, "Socket's accept() method failed", e);
+                break;
+            }
+
+            if (btSocket != null) {
+                // A connection was accepted. Perform work associated with
+                // the connection in a separate thread.
+                manageMyConnectedSocket(btSocket);
+                try {
+                    btServerSocket.close();
+                } catch (IOException e) {
+
+                }
+
+                break;
+            }
+        }
+
+
 
 
 
@@ -126,6 +171,15 @@ public class SensorActivity extends AppCompatActivity {
             }
         };
 
+    }
+
+    private void manageMyConnectedSocket(BluetoothSocket btSocket) {
+        mConnectedThread = new ConnectedThread(btSocket);
+        mConnectedThread.start();
+
+        //I send a character when resuming.beginning transmission to check device is connected
+        //If it is not an exception will be thrown in the write method and finish() will be called
+        mConnectedThread.run();
     }
 
     private class ConnectedThread extends Thread {
