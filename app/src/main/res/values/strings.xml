@@ -2,4 +2,6 @@
     <string name="app_name">solarTracker</string>
 
     <string name="displayResult" formatted="false">%.2f%s </string>
+
+    <string name="none_paired">No devices paired</string>
 </resources>

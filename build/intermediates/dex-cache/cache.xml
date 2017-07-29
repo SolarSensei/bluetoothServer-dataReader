@@ -3,21 +3,21 @@
 
     <item
         is-multidex="true"
+        jar="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="710834f10d92ccae06326c543217759cf2157f99">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_5578acb1120304926404a7a430ecf4bf52cf1ad9/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
         sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
         <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_dc90802c84c03f76a40c1a8b74718d8d7cc8b6b4/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="cbd444e683be4d92fa5e3b085c2ec7ecc541e397">
-        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_5578acb1120304926404a7a430ecf4bf52cf1ad9/classes.dex" />
     </item>
 
 </items>
