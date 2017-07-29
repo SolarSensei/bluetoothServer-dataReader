@@ -144,7 +144,11 @@ public class SensorActivity extends AppCompatActivity {
                     if (endOfLineIndex > 0) {
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);
                         dataView.setText(dataInPrint);
+                        recDataString.delete(0, recDataString.length());
+                        dataInPrint = " ";
                     }
+
+
 //                    if (endOfLineIndex > 0) {                                           // make sure there data before ~
 //                        String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
 //                        txtString.setText("Data Received = " + dataInPrint);
@@ -170,6 +174,41 @@ public class SensorActivity extends AppCompatActivity {
                 }
             }
         };
+
+
+//        bluetoothIn = new Handler() {
+//            public void handleMessage(android.os.Message msg) {
+//                if (msg.what == handlerState) {										//if message is what we want
+//                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+//                    if (readMessage.length() > 0) {
+//                        char firstChar = readMessage.charAt(0);
+//                        switch (firstChar) {
+//                            case '1': mPressureView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "mbars"));
+//                                break;
+//                            case '2': mTempView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°C"));
+//                                break;
+//                            case '3': mLightView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°lx"));
+//                                break;
+//                            case '4': mHumidityView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "%"));
+//                                break;
+//                            case '5': mMagneticView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "μT"));
+//                                break;
+//                            case '6': azimuthView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°"));
+//                                break;
+//                            case '7': pitchView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°"));
+//                                break;
+//                            case '8': rollView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°"));
+//                                break;
+//                            default:
+//                                break;
+//
+//                        }
+//
+//                    }
+//                }
+//            }
+//        };
+
 
     }
 
