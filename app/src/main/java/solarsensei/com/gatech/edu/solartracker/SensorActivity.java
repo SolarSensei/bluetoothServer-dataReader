@@ -3,6 +3,7 @@ package solarsensei.com.gatech.edu.solartracker;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -31,12 +33,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 /**
  * Created by timothybaba on 5/19/17.
  */
-public class SensorActivity extends AppCompatActivity implements SensorEventListener {
+public class SensorActivity extends AppCompatActivity {
     /**
      * widgets
      */
@@ -49,29 +53,23 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     private TextView azimuthView;
     private TextView pitchView;
     private TextView rollView;
+    private TextView dataView;
     private float[] mRotationMatrix = new float[9];
     private float[] mOrientationValues = new float[3];
     private TextView connectionStatus;
     private ListView pairedDevices;
     private TextView msg;
 
-    private SensorManager mSensorManager;
-
-    private ArrayAdapter<String> mPairedDevicesArrayAdapter;
-    private BluetoothAdapter mBtAdapter;
-
-    //Environmental sensors
-    private Sensor mPressure;
-    private Sensor mTemperature;
-    private Sensor mLight;
-    private Sensor mRelativeHumidity;
-    private Sensor mMagneticField;
 
     //motion sensors
     private Sensor mRotation;
 
     //constants
     private final static int REQUEST_ENABLE_BT = 1;
+
+    Handler bluetoothIn;
+    final int handlerState = 0;
+    private StringBuilder recDataString = new StringBuilder();
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -87,256 +85,82 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         pitchView = (TextView) findViewById(R.id.pitch);
         rollView = (TextView) findViewById(R.id.roll);
         mButton = (Button) findViewById(R.id.startPairing);
-
-
-        // Gets an instance of the sensor service, and uses that to get an instance of
-        // a particular sensor.
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-        mPressure = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
-        mTemperature = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-        mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        mRelativeHumidity = mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
-
-        mMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        mRotation = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        dataView = (TextView) findViewById(R.id.data);
 
 
 
+        bluetoothIn = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                if (msg.what == handlerState) {										//if message is what we want
+                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+                    recDataString.append(readMessage);      								//keep appending to string until ~
+                   int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
 
-
-    }
-
-    @Override
-    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
-        //To Do
-        // Data gets sent to solar panels only when accuracy is high
-    }
-
-    @Override
-    public final void onSensorChanged(SensorEvent event) {
-        // Reads in sensor data.
-        try {
-            switch (event.sensor.getType()) {
-                case Sensor.TYPE_PRESSURE:
-                    mPressureView.setText(String.format(getString(R.string.displayResult), event.values[0], "mbars"));
-                    break;
-                case Sensor.TYPE_AMBIENT_TEMPERATURE:
-                    mTempView.setText(String.format(getString(R.string.displayResult), event.values[0], "°C"));
-                    break;
-                case Sensor.TYPE_LIGHT:
-                    mLightView.setText(String.format(getString(R.string.displayResult), event.values[0], "°lx"));
-                    break;
-                case Sensor.TYPE_RELATIVE_HUMIDITY:
-                    mHumidityView.setText(String.format(getString(R.string.displayResult), event.values[0], "%"));
-                    break;
-                case Sensor.TYPE_MAGNETIC_FIELD:
-                    mMagneticView.setText(String.format(getString(R.string.displayResult), event.values[0], "μT"));
-                    break;
-                case Sensor.TYPE_ROTATION_VECTOR:
-                    SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
-                    SensorManager.getOrientation(mRotationMatrix, mOrientationValues);
-                    azimuthView.setText(String.format(getString(R.string.displayResult), Math.toDegrees(mOrientationValues[0]), "°"));
-                    pitchView.setText(String.format(getString(R.string.displayResult), Math.toDegrees(mOrientationValues[1]), "°"));
-                    rollView.setText(String.format(getString(R.string.displayResult), Math.toDegrees(mOrientationValues[2]), "°"));
-                    break;
-                default:
-                    break;
+                    if (endOfLineIndex > 0) {
+                        String dataInPrint = recDataString.substring(0, endOfLineIndex);
+                        dataView.setText(dataInPrint);
+                    }
+//                    if (endOfLineIndex > 0) {                                           // make sure there data before ~
+//                        String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
+//                        txtString.setText("Data Received = " + dataInPrint);
+//                        int dataLength = dataInPrint.length();							//get length of data received
+//                        txtStringLength.setText("String Length = " + String.valueOf(dataLength));
+//
+//                        if (recDataString.charAt(0) == '#')								//if it starts with # we know it is what we are looking for
+//                        {
+//                            String sensor0 = recDataString.substring(1, 5);             //get sensor value from string between indices 1-5
+//                            String sensor1 = recDataString.substring(6, 10);            //same again...
+//                            String sensor2 = recDataString.substring(11, 15);
+//                            String sensor3 = recDataString.substring(16, 20);
+//
+//                            sensorView0.setText(" Sensor 0 Voltage = " + sensor0 + "V");	//update the textviews with sensor values
+//                            sensorView1.setText(" Sensor 1 Voltage = " + sensor1 + "V");
+//                            sensorView2.setText(" Sensor 2 Voltage = " + sensor2 + "V");
+//                            sensorView3.setText(" Sensor 3 Voltage = " + sensor3 + "V");
+//                        }
+//                        recDataString.delete(0, recDataString.length()); 					//clear all string data
+//                        // strIncom =" ";
+//                        dataInPrint = " ";
+//                    }
+                }
             }
+        };
 
-        } catch (Exception e) {
-            throw e;
-        }
     }
 
-    @Override
-    protected void onResume() {
-        // Registers a listener for the sensor.
-        super.onResume();
-        mSensorManager.registerListener(this, mPressure, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mTemperature, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mRelativeHumidity, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mMagneticField, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mRotation, SensorManager.SENSOR_DELAY_NORMAL);
+    private class ConnectedThread extends Thread {
+        private final InputStream mmInStream;
 
-        mButton.setOnClickListener(new View.OnClickListener() {
+        //creation of the connect thread
+        public ConnectedThread(BluetoothSocket socket) {
+            InputStream tmpIn = null;
 
-            @Override
-            public void onClick(View v) {
-                checkBluetoothStatus();
+            try {
+                //Create I/O streams for connection
+                tmpIn = socket.getInputStream();
+            } catch (IOException e) { }
 
-
-
-            }
-        });
-    }
-
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                //discovery starts, we can show progress dialog or perform other tasks
-                msg.setText("Scanning for new devices...");
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                //discovery finishes, dismis progress dialog
-            } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)){
-
-
-            } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                System.out.println("Yes found");
-                //bluetooth device found;
-                msg.setText("Found devices");
-                BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-            }
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // Don't forget to unregister the ACTION_FOUND receiver.
-        unregisterReceiver(mReceiver);
-    }
-
-
-    @Override
-    protected void onPause() {
-        // Unregisters the sensor when the activity pauses.
-        super.onPause();
-        mSensorManager.unregisterListener(this);
-    }
-
-    private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
-        public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
-
-            connectionStatus.setText("Connecting...");
-            // Get the device MAC address, which is the last 17 chars in the View
-            String info = ((TextView) v).getText().toString();
-            String address = info.substring(info.length() - 17);
-
-            // Make an intent to start next activity while taking an extra which is the MAC address.
-//            Intent i = new Intent(DeviceListActivity.this, MainActivity.class);
-//            i.putExtra(EXTRA_DEVICE_ADDRESS, address);
-//            startActivity(i);
-        }
-    };
-
-    private void checkBluetoothStatus() {
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBtAdapter == null) {
-            Toast.makeText(getBaseContext(), "Bluetooth is not supported on this device", Toast.LENGTH_LONG).show();
-            finish();
-        } else {
-            if (!mBtAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            } else {
-                startDialog();
-            }
+            mmInStream = tmpIn;
         }
 
 
-    }
+        public void run() {
+            byte[] buffer = new byte[256];
+            int bytes;
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_ENABLE_BT) {
-            if(resultCode != 0){
-                // bluetooth enabled
-                startDialog();
-
-            } else{
-                Toast.makeText(getBaseContext(), "You must enable bluetooth to transfer data", Toast.LENGTH_LONG).show();
+            // Keep looping to listen for received messages
+            while (true) {
+                try {
+                    bytes = mmInStream.read(buffer);        	//read bytes from input buffer
+                    String readMessage = new String(buffer, 0, bytes);
+                    // Send the obtained bytes to the UI Activity via handler
+                    bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
+                } catch (IOException e) {
+                    break;
+                }
             }
         }
 
-
     }
-
-    private void  startDialog() {
-        final AlertDialog.Builder alert = new AlertDialog.Builder(SensorActivity.this);
-        alert.setView(R.layout.activity_dialogue);
-
-        alert.setPositiveButton("Scan", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-
-            }
-        });
-
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Canceled.
-            }
-        });
-
-        final AlertDialog dialog = alert.create();
-        dialog.show();
-
-        final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        LinearLayout parent = (LinearLayout) positiveButton.getParent();
-        parent.setGravity(Gravity.CENTER_HORIZONTAL);
-        View leftSpacer = parent.getChildAt(1);
-        leftSpacer.setVisibility(View.GONE);
-
-        msg = (TextView)dialog.findViewById(R.id.title_paired_devices);
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                mPairedDevicesArrayAdapter.clear();
-                mBtAdapter.startDiscovery();
-                IntentFilter filter = new IntentFilter();
-
-                filter.addAction(BluetoothDevice.ACTION_FOUND);
-                filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-                filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-
-                registerReceiver(mReceiver, filter);
-
-
-            }
-        });
-
-        connectionStatus = (TextView) dialog.findViewById(R.id.connecting);
-        connectionStatus.setText(" ");
-        connectionStatus.setTextSize(40);
-
-        //               Initialize array adapter for paired devices
-        mPairedDevicesArrayAdapter = new ArrayAdapter<>(dialog.getContext(), R.layout.activity_devices);
-
-        // Find and set up the ListView for paired devices
-        ListView pairedListView = (ListView) dialog.findViewById(R.id.paired_devices);
-        pairedListView.setAdapter(mPairedDevicesArrayAdapter);
-        pairedListView.setOnItemClickListener(mDeviceClickListener);
-
-        // Get the local Bluetooth adapter
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        // Get a set of currently paired devices and append to 'pairedDevices'
-        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
-
-        // Add previosuly paired devices to the array
-        if (pairedDevices.size() > 0) {
-            // dialog.findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);//make title viewable
-            msg.setText("Paired devices");
-            for (BluetoothDevice device : pairedDevices) {
-                mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-            }
-        } else {
-            String noDevices = getResources().getText(R.string.none_paired).toString();
-            mPairedDevicesArrayAdapter.add(noDevices);
-            // dialog.findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);//make title viewable
-
-
-        }
-    }
-
-
 }
+
