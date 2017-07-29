@@ -19,7 +19,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -273,9 +275,14 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         });
 
         final AlertDialog dialog = alert.create();
-
-
         dialog.show();
+
+        final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        LinearLayout parent = (LinearLayout) positiveButton.getParent();
+        parent.setGravity(Gravity.CENTER_HORIZONTAL);
+        View leftSpacer = parent.getChildAt(1);
+        leftSpacer.setVisibility(View.GONE);
+
         msg = (TextView)dialog.findViewById(R.id.title_paired_devices);
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
