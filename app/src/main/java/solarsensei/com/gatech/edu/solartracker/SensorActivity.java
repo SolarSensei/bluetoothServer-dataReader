@@ -134,12 +134,12 @@ public class SensorActivity extends AppCompatActivity {
 
 
     }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        AcceptThread accept = new AcceptThread();
-        accept.run();
-    }
+//    @Override
+//    protected void onResume() {
+////        super.onResume();
+////        AcceptThread accept = new AcceptThread();
+////        accept.run();
+//    }
 
     private void manageMyConnectedSocket(BluetoothSocket btSocket) {
         mConnectedThread = new ConnectedThread(btSocket);
