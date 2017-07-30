@@ -93,11 +93,11 @@ public class SensorActivity extends AppCompatActivity {
         azimuthView = (TextView) findViewById(R.id.azimuth);
         pitchView = (TextView) findViewById(R.id.pitch);
         rollView = (TextView) findViewById(R.id.roll);
-        mButton = (Button) findViewById(R.id.startPairing);
         dataView = (TextView) findViewById(R.id.data);
 
 
         BluetoothServerSocket tmp = null;
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         try {
             // MY_UUID is the app's UUID string, also used by the client code.
             tmp = mBtAdapter.listenUsingRfcommWithServiceRecord("SecureConnection", BTMODULEUUID);
@@ -260,7 +260,10 @@ public class SensorActivity extends AppCompatActivity {
                     bytes = mmInStream.read(buffer);        	//read bytes from input buffer
                     String readMessage = new String(buffer, 0, bytes);
                     // Send the obtained bytes to the UI Activity via handler
-                    bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
+                    if (bluetoothIn != null) {
+                        bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
+                    }
+
                 } catch (IOException e) {
                     break;
                 }
