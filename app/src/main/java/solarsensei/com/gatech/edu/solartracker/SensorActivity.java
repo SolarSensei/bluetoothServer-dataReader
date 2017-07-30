@@ -1,6 +1,7 @@
 package solarsensei.com.gatech.edu.solartracker;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -10,10 +11,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -61,6 +64,10 @@ public class SensorActivity extends AppCompatActivity {
     private TextView connectionStatus;
     private ListView pairedDevices;
     private TextView msg;
+    private  TextView transmitView;
+    private  Button acceptButton;
+
+    private ProgressDialog mProgressDialog;
 
 
     //motion sensors
@@ -94,6 +101,8 @@ public class SensorActivity extends AppCompatActivity {
         pitchView = (TextView) findViewById(R.id.pitch);
         rollView = (TextView) findViewById(R.id.roll);
         dataView = (TextView) findViewById(R.id.data);
+        transmitView = (TextView) findViewById(R.id.transmitStatus);
+        acceptButton = (Button) findViewById(R.id.accept);
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -132,6 +141,14 @@ public class SensorActivity extends AppCompatActivity {
             }
         };
 
+        acceptButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                new bluetoothAcceptTask().execute();
+            }
+        });
+
 
     }
 //    @Override
@@ -148,6 +165,36 @@ public class SensorActivity extends AppCompatActivity {
         //I send a character when resuming.beginning transmission to check device is connected
         //If it is not an exception will be thrown in the write method and finish() will be called
         mConnectedThread.run();
+    }
+
+    private  class bluetoothAcceptTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+
+            if (SensorActivity.this.mProgressDialog == null) {
+                SensorActivity.this.mProgressDialog = new ProgressDialog(SensorActivity.this);
+                SensorActivity.this.mProgressDialog.setMessage("Accepting connection...");
+                SensorActivity.this.mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            }
+
+            SensorActivity.this.mProgressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // do tracks loading process here, don't update UI directly here because there is different mechanism for it
+            AcceptThread accept = new AcceptThread();
+            accept.run();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+            // write display tracks logic here
+            SensorActivity.this.mProgressDialog.dismiss();  // dismiss dialog
+        }
     }
 
     private class ConnectedThread extends Thread {
@@ -181,9 +228,37 @@ public class SensorActivity extends AppCompatActivity {
                     i++;
                     if (bluetoothIn != null) {
                         bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
+                        if (readMessage == "x") {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast toast =  Toast.makeText(SensorActivity.this, "Accepted Connection!",
+                                            Toast.LENGTH_LONG);
+                                    TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                                    toast.setGravity(Gravity.CENTER, 0, 0);
+                                    v.setTextColor(Color.GREEN);
+                                    mProgressDialog.dismiss();
+                                    toast.show();
+                                    transmitView.setText("receiving data...");
+                                }
+                            });
+                        }
+
                     }
 
                 } catch (IOException e) {
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast toast =  Toast.makeText(SensorActivity.this, "Connection Failure ",
+                                    Toast.LENGTH_LONG);
+                            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            v.setTextColor(Color.RED);
+                            toast.show();
+                            transmitView.setText("");
+                        }
+                    });
+
                     break;
                 }
             }
