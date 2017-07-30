@@ -116,11 +116,11 @@ public class SensorActivity extends AppCompatActivity {
                                 break;
                             case '5': mMagneticView.setText(readMessage.substring(1));
                                 break;
-                            case '6': azimuthView.setText(readMessage.substring(1));
-                                break;
-                            case '7': pitchView.setText(readMessage.substring(1));
-                                break;
-                            case '8': rollView.setText(readMessage.substring(1));
+                            case '6':
+                                System.out.println(readMessage);
+                                azimuthView.setText(readMessage.substring(readMessage.indexOf('A') + 1, readMessage.indexOf('P')));
+                                pitchView.setText(readMessage.substring(readMessage.indexOf('P') + 1, readMessage.indexOf('R')));
+                                rollView.setText(readMessage.substring(readMessage.indexOf('R') + 1));
                                 break;
                             default:
                                 break;
