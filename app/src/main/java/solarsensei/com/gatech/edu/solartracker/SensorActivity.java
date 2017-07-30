@@ -98,82 +98,39 @@ public class SensorActivity extends AppCompatActivity {
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
 
+
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 if (msg.what == handlerState) {										//if message is what we want
                     String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
-                    dataView.setText(readMessage);
-                    recDataString.append(readMessage);      								//keep appending to string until ~
-                   int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
+                    if (readMessage.length() > 0) {
+                        char firstChar = readMessage.charAt(0);
+                        switch (firstChar) {
+                            case '1': mPressureView.setText(readMessage.substring(1));
+                                break;
+                            case '2': mTempView.setText(readMessage.substring(1));
+                                break;
+                            case '3': mLightView.setText(readMessage.substring(1));
+                                break;
+                            case '4': mHumidityView.setText(readMessage.substring(1));
+                                break;
+                            case '5': mMagneticView.setText(readMessage.substring(1));
+                                break;
+                            case '6': azimuthView.setText(readMessage.substring(1));
+                                break;
+                            case '7': pitchView.setText(readMessage.substring(1));
+                                break;
+                            case '8': rollView.setText(readMessage.substring(1));
+                                break;
+                            default:
+                                break;
 
-                    if (endOfLineIndex > 0) {
-                        String dataInPrint = recDataString.substring(0, endOfLineIndex);
-                        System.out.println(dataInPrint);
-                        dataView.setText(dataInPrint);
-                        recDataString.delete(0, recDataString.length());
-                        dataInPrint = " ";
+                        }
+
                     }
-
-
-//                    if (endOfLineIndex > 0) {                                           // make sure there data before ~
-//                        String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
-//                        txtString.setText("Data Received = " + dataInPrint);
-//                        int dataLength = dataInPrint.length();							//get length of data received
-//                        txtStringLength.setText("String Length = " + String.valueOf(dataLength));
-//
-//                        if (recDataString.charAt(0) == '#')								//if it starts with # we know it is what we are looking for
-//                        {
-//                            String sensor0 = recDataString.substring(1, 5);             //get sensor value from string between indices 1-5
-//                            String sensor1 = recDataString.substring(6, 10);            //same again...
-//                            String sensor2 = recDataString.substring(11, 15);
-//                            String sensor3 = recDataString.substring(16, 20);
-//
-//                            sensorView0.setText(" Sensor 0 Voltage = " + sensor0 + "V");	//update the textviews with sensor values
-//                            sensorView1.setText(" Sensor 1 Voltage = " + sensor1 + "V");
-//                            sensorView2.setText(" Sensor 2 Voltage = " + sensor2 + "V");
-//                            sensorView3.setText(" Sensor 3 Voltage = " + sensor3 + "V");
-//                        }
-//                        recDataString.delete(0, recDataString.length()); 					//clear all string data
-//                        // strIncom =" ";
-//                        dataInPrint = " ";
-//                    }
                 }
             }
         };
-
-
-//        bluetoothIn = new Handler() {
-//            public void handleMessage(android.os.Message msg) {
-//                if (msg.what == handlerState) {										//if message is what we want
-//                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
-//                    if (readMessage.length() > 0) {
-//                        char firstChar = readMessage.charAt(0);
-//                        switch (firstChar) {
-//                            case '1': mPressureView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "mbars"));
-//                                break;
-//                            case '2': mTempView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°C"));
-//                                break;
-//                            case '3': mLightView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°lx"));
-//                                break;
-//                            case '4': mHumidityView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "%"));
-//                                break;
-//                            case '5': mMagneticView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "μT"));
-//                                break;
-//                            case '6': azimuthView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°"));
-//                                break;
-//                            case '7': pitchView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°"));
-//                                break;
-//                            case '8': rollView.setText(String.format(getString(R.string.displayResult), readMessage.substring(1), "°"));
-//                                break;
-//                            default:
-//                                break;
-//
-//                        }
-//
-//                    }
-//                }
-//            }
-//        };
 
 
     }
