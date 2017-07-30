@@ -198,10 +198,12 @@ public class SensorActivity extends AppCompatActivity {
 
     private class ConnectedThread extends Thread {
         private final InputStream mmInStream;
+        private BluetoothSocket connectSocket;
 
         //creation of the connect thread
         public ConnectedThread(BluetoothSocket socket) {
             InputStream tmpIn = null;
+            this.connectSocket = socket;
 
             try {
                 //Create I/O streams for connection
@@ -218,7 +220,7 @@ public class SensorActivity extends AppCompatActivity {
             int i = 0;
 
             // Keep looping to listen for received messages
-            while (true) {
+            while (connectSocket != null) {
                 try {
                     bytes = mmInStream.read(buffer);        	//read bytes from input buffer
                     String readMessage = new String(buffer, 0, bytes);
@@ -261,6 +263,27 @@ public class SensorActivity extends AppCompatActivity {
 
                     break;
                 }
+            }
+        }
+
+        //To do. Call this method when stop accepting data button is called.
+        public void cancel() {
+            try {
+                connectSocket.close();
+            } catch (IOException e) {
+                // mProgressDialog.dismiss();
+                //Log.e(TAG, "Could not close the connect socket", e);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast toast =  Toast.makeText(SensorActivity.this, "Could not close the connect socket",
+                                Toast.LENGTH_LONG);
+                        TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        v.setTextColor(Color.RED);
+                        toast.show();
+                        transmitView.setText("");
+                    }
+                });
             }
         }
 
