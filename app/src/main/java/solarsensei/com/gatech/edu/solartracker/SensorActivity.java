@@ -71,7 +71,7 @@ public class SensorActivity extends AppCompatActivity {
 
     Handler bluetoothIn;
     final int handlerState = 0;
-    private BluetoothServerSocket btServerSocket = null;
+    //private BluetoothServerSocket btServerSocket = null;
     private StringBuilder recDataString = new StringBuilder();
 
     private BluetoothAdapter mBtAdapter;
@@ -95,54 +95,20 @@ public class SensorActivity extends AppCompatActivity {
         rollView = (TextView) findViewById(R.id.roll);
         dataView = (TextView) findViewById(R.id.data);
 
-
-        BluetoothServerSocket tmp = null;
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-        try {
-            // MY_UUID is the app's UUID string, also used by the client code.
-            tmp = mBtAdapter.listenUsingRfcommWithServiceRecord("SecureConnection", BTMODULEUUID);
-        } catch (IOException e) {
-           // Log.e(TAG, "Socket's listen() method failed", e);
-        }
-        btServerSocket = tmp;
-
-        BluetoothSocket btSocket = null;
-        // Keep listening until exception occurs or a socket is returned.
-        while (true) {
-            try {
-                btSocket = btServerSocket.accept();
-            } catch (IOException e) {
-               // Log.e(TAG, "Socket's accept() method failed", e);
-                break;
-            }
-
-            if (btSocket != null) {
-                // A connection was accepted. Perform work associated with
-                // the connection in a separate thread.
-                manageMyConnectedSocket(btSocket);
-                try {
-                    btServerSocket.close();
-                } catch (IOException e) {
-
-                }
-
-                break;
-            }
-        }
-
-
-
 
 
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 if (msg.what == handlerState) {										//if message is what we want
                     String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+                    dataView.setText(readMessage);
                     recDataString.append(readMessage);      								//keep appending to string until ~
                    int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
 
                     if (endOfLineIndex > 0) {
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);
+                        System.out.println(dataInPrint);
                         dataView.setText(dataInPrint);
                         recDataString.delete(0, recDataString.length());
                         dataInPrint = " ";
@@ -211,18 +177,11 @@ public class SensorActivity extends AppCompatActivity {
 
 
     }
-
     @Override
-    public void onPause()
-    {
-        super.onPause();
-        try
-        {
-            //Don't leave Bluetooth sockets open when leaving activity
-            btServerSocket.close();
-        } catch (IOException e2) {
-            //insert code to deal with this
-        }
+    protected void onResume() {
+        super.onResume();
+        AcceptThread accept = new AcceptThread();
+        accept.run();
     }
 
     private void manageMyConnectedSocket(BluetoothSocket btSocket) {
@@ -253,6 +212,7 @@ public class SensorActivity extends AppCompatActivity {
         public void run() {
             byte[] buffer = new byte[256];
             int bytes;
+            int i = 0;
 
             // Keep looping to listen for received messages
             while (true) {
@@ -260,6 +220,8 @@ public class SensorActivity extends AppCompatActivity {
                     bytes = mmInStream.read(buffer);        	//read bytes from input buffer
                     String readMessage = new String(buffer, 0, bytes);
                     // Send the obtained bytes to the UI Activity via handler
+                    System.out.println(i + "yes");
+                    i++;
                     if (bluetoothIn != null) {
                         bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
                     }
@@ -270,6 +232,58 @@ public class SensorActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    private class AcceptThread extends Thread {
+        private final BluetoothServerSocket mmServerSocket;
+
+        public AcceptThread() {
+            // Use a temporary object that is later assigned to mmServerSocket
+            // because mmServerSocket is final.
+            BluetoothServerSocket tmp = null;
+            try {
+                // MY_UUID is the app's UUID string, also used by the client code.
+                tmp = mBtAdapter.listenUsingRfcommWithServiceRecord("SecureConnection", BTMODULEUUID);
+            } catch (IOException e) {
+               // Log.e(TAG, "Socket's listen() method failed", e);
+            }
+            mmServerSocket = tmp;
+        }
+
+        public void run() {
+            BluetoothSocket socket = null;
+            // Keep listening until exception occurs or a socket is returned.
+            while (true) {
+                try {
+                    socket = mmServerSocket.accept();
+                } catch (IOException e) {
+                   // Log.e(TAG, "Socket's accept() method failed", e);
+                    break;
+                }
+
+                if (socket != null) {
+                    // A connection was accepted. Perform work associated with
+                    // the connection in a separate thread.
+                    manageMyConnectedSocket(socket);
+
+                    try {
+                        mmServerSocket.close();
+                    } catch (IOException e) {
+
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Closes the connect socket and causes the thread to finish.
+        public void cancel() {
+            try {
+                mmServerSocket.close();
+            } catch (IOException e) {
+                //Log.e(TAG, "Could not close the connect socket", e);
+            }
+        }
     }
 }
 
