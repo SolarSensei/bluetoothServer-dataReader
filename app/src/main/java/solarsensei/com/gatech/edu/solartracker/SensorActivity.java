@@ -100,7 +100,6 @@ public class SensorActivity extends AppCompatActivity {
         azimuthView = (TextView) findViewById(R.id.azimuth);
         pitchView = (TextView) findViewById(R.id.pitch);
         rollView = (TextView) findViewById(R.id.roll);
-        dataView = (TextView) findViewById(R.id.data);
         transmitView = (TextView) findViewById(R.id.transmitStatus);
         acceptButton = (Button) findViewById(R.id.accept);
 
@@ -174,7 +173,7 @@ public class SensorActivity extends AppCompatActivity {
 
             if (SensorActivity.this.mProgressDialog == null) {
                 SensorActivity.this.mProgressDialog = new ProgressDialog(SensorActivity.this);
-                SensorActivity.this.mProgressDialog.setMessage("Accepting connection...");
+                SensorActivity.this.mProgressDialog.setMessage("Waiting for connection...");
                 SensorActivity.this.mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             }
 
