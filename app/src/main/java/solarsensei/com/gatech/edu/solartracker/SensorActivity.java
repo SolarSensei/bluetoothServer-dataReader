@@ -245,6 +245,7 @@ public class SensorActivity extends AppCompatActivity {
                     }
 
                 } catch (IOException e) {
+                    mProgressDialog.dismiss();
 
                     runOnUiThread(new Runnable() {
                         public void run() {
@@ -289,6 +290,18 @@ public class SensorActivity extends AppCompatActivity {
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
                    // Log.e(TAG, "Socket's accept() method failed", e);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast toast =  Toast.makeText(SensorActivity.this, "Socket's accept() method failed",
+                                    Toast.LENGTH_LONG);
+                            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            v.setTextColor(Color.RED);
+                            toast.show();
+                            transmitView.setText("");
+                        }
+                    });
+
                     break;
                 }
 
@@ -296,15 +309,37 @@ public class SensorActivity extends AppCompatActivity {
                     // A connection was accepted. Perform work associated with
                     // the connection in a separate thread.
                     manageMyConnectedSocket(socket);
-
-                    try {
-                        mmServerSocket.close();
-                    } catch (IOException e) {
-
-                    }
+                    cancel();
                     break;
                 }
             }
+
+            //best way to implement after everything works fine
+//            try {
+//                 //wait for 100000 milliseconds
+//                socket = mmServerSocket.accept(10000);
+//            } catch (IOException e) {
+//                // Log.e(TAG, "Socket's accept() method failed", e);
+//                runOnUiThread(new Runnable() {
+//                    public void run() {
+//                        Toast toast =  Toast.makeText(SensorActivity.this, "No incoming connection ",
+//                                Toast.LENGTH_LONG);
+//                        TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+//                        toast.setGravity(Gravity.CENTER, 0, 0);
+//                        v.setTextColor(Color.RED);
+//                        toast.show();
+//                        transmitView.setText("");
+//                    }
+//                });
+//            }
+//
+//            if (socket != null) {
+//                // A connection was accepted. Perform work associated with
+//                // the connection in a separate thread.
+//                manageMyConnectedSocket(socket);
+//                cancel();
+//            }
+
         }
 
         // Closes the connect socket and causes the thread to finish.
@@ -312,7 +347,19 @@ public class SensorActivity extends AppCompatActivity {
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
+               // mProgressDialog.dismiss();
                 //Log.e(TAG, "Could not close the connect socket", e);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast toast =  Toast.makeText(SensorActivity.this, "Could not close the connect socket",
+                                Toast.LENGTH_LONG);
+                        TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        v.setTextColor(Color.RED);
+                        toast.show();
+                        transmitView.setText("");
+                    }
+                });
             }
         }
     }
