@@ -49,7 +49,6 @@ public class SensorActivity extends AppCompatActivity {
     /**
      * widgets
      */
-    private Button mButton;
     private TextView mPressureView;
     private TextView mTempView;
     private TextView mLightView;
@@ -85,6 +84,9 @@ public class SensorActivity extends AppCompatActivity {
 
     private ConnectedThread mConnectedThread;
 
+    private final String startTransfer = "START RECEIVING DATA";
+    private final String stopTransfer = "STOP RECEIVING DATA";
+
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
@@ -104,6 +106,8 @@ public class SensorActivity extends AppCompatActivity {
         acceptButton = (Button) findViewById(R.id.accept);
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        acceptButton.setText(startTransfer);
 
 
 
@@ -144,7 +148,19 @@ public class SensorActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                new bluetoothAcceptTask().execute();
+                if (acceptButton.getText().equals(startTransfer)) {
+                    new bluetoothAcceptTask().execute();
+
+                    // if acceptButton.getText().equals(stopTransfer)
+                } else {
+                    try {
+                        mConnectedThread.cancel();
+                        acceptButton.setText(startTransfer);
+                    } catch (Exception e) {
+
+                    }
+                }
+
             }
         });
 
@@ -215,7 +231,7 @@ public class SensorActivity extends AppCompatActivity {
 
 
         public void run() {
-            byte[] buffer = new byte[256];
+            byte[] buffer = new byte[1024];
             int bytes;
             int i = 0;
 
@@ -229,7 +245,8 @@ public class SensorActivity extends AppCompatActivity {
                     i++;
                     if (bluetoothIn != null) {
                         bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
-                        if (readMessage == "x") {
+                        if (readMessage.equals("x")) {
+                            System.out.println("message: " + readMessage);
                             runOnUiThread(new Runnable() {
                                 public void run() {
                                     Toast toast =  Toast.makeText(SensorActivity.this, "Accepted Connection!",
@@ -239,10 +256,17 @@ public class SensorActivity extends AppCompatActivity {
                                     v.setTextColor(Color.GREEN);
                                     mProgressDialog.dismiss();
                                     toast.show();
-                                    transmitView.setText("receiving data...");
                                 }
                             });
                         }
+
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                transmitView.setText("receiving data...");
+                                acceptButton.setText(stopTransfer);
+                            }
+                        });
+
 
                     }
 
@@ -336,33 +360,6 @@ public class SensorActivity extends AppCompatActivity {
                     break;
                 }
             }
-
-            //best way to implement after everything works fine
-//            try {
-//                 //wait for 100000 milliseconds
-//                socket = mmServerSocket.accept(10000);
-//            } catch (IOException e) {
-//                // Log.e(TAG, "Socket's accept() method failed", e);
-//                runOnUiThread(new Runnable() {
-//                    public void run() {
-//                        Toast toast =  Toast.makeText(SensorActivity.this, "No incoming connection ",
-//                                Toast.LENGTH_LONG);
-//                        TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-//                        toast.setGravity(Gravity.CENTER, 0, 0);
-//                        v.setTextColor(Color.RED);
-//                        toast.show();
-//                        transmitView.setText("");
-//                    }
-//                });
-//            }
-//
-//            if (socket != null) {
-//                // A connection was accepted. Perform work associated with
-//                // the connection in a separate thread.
-//                manageMyConnectedSocket(socket);
-//                cancel();
-//            }
-
         }
 
         // Closes the connect socket and causes the thread to finish.
