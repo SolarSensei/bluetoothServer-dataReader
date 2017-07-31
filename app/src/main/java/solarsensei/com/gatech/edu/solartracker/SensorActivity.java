@@ -1,45 +1,24 @@
 package solarsensei.com.gatech.edu.solartracker;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -57,12 +36,6 @@ public class SensorActivity extends AppCompatActivity {
     private TextView azimuthView;
     private TextView pitchView;
     private TextView rollView;
-    private TextView dataView;
-    private float[] mRotationMatrix = new float[9];
-    private float[] mOrientationValues = new float[3];
-    private TextView connectionStatus;
-    private ListView pairedDevices;
-    private TextView msg;
     private  TextView transmitView;
     private  Button acceptButton;
     private Button cancelAction;
@@ -146,10 +119,6 @@ public class SensorActivity extends AppCompatActivity {
 //                            rollView.setText(readMessage.substring(readMessage.indexOf('R') + 1));
 //                        }
 //
-
-
-
-
 
 
 
