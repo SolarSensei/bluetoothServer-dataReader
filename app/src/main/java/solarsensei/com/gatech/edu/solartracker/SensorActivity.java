@@ -125,6 +125,34 @@ public class SensorActivity extends AppCompatActivity {
                 if (msg.what == handlerState) {										//if message is what we want
                     String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
                     if (readMessage.length() > 0) {
+//                        if (readMessage.indexOf('B') > 0) {
+//                            mPressureView.setText(readMessage.substring(readMessage.indexOf('B') + 1, readMessage.indexOf('D')));
+//                        }
+//                        if (readMessage.indexOf('E') > 0) {
+//                            mTempView.setText(readMessage.substring(readMessage.indexOf('E') + 1, readMessage.indexOf('F')));
+//                        }
+//                        if (readMessage.indexOf('G') > 0) {
+//                            mLightView.setText(readMessage.substring(readMessage.indexOf('G') + 1, readMessage.indexOf('H')));
+//                        }
+//                        if (readMessage.indexOf('I') > 0) {
+//                            mHumidityView.setText(readMessage.substring(readMessage.indexOf('I') + 1, readMessage.indexOf('J')));
+//                        }
+//                        if (readMessage.indexOf('K') > 0) {
+//                            mMagneticView.setText(readMessage.substring(readMessage.indexOf('K') + 1, readMessage.indexOf('L')));
+//                        }
+//                        if (readMessage.indexOf('A') > 0) {
+//                            azimuthView.setText(readMessage.substring(readMessage.indexOf('A') + 1, readMessage.indexOf('P')));
+//                            pitchView.setText(readMessage.substring(readMessage.indexOf('P') + 1, readMessage.indexOf('R')));
+//                            rollView.setText(readMessage.substring(readMessage.indexOf('R') + 1));
+//                        }
+//
+
+
+
+
+
+
+
                         char firstChar = readMessage.charAt(0);
                         switch (firstChar) {
                             case '1': mPressureView.setText(readMessage.substring(1));
@@ -142,7 +170,7 @@ public class SensorActivity extends AppCompatActivity {
                                 azimuthView.setText(readMessage.substring(readMessage.indexOf('A') + 1, readMessage.indexOf('P')));
                                 pitchView.setText(readMessage.substring(readMessage.indexOf('P') + 1, readMessage.indexOf('R')));
                                 rollView.setText(readMessage.substring(readMessage.indexOf('R') + 1));
-                                break;
+//                                break;
                             default:
                                 break;
 
