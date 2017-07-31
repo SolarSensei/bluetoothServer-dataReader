@@ -65,6 +65,7 @@ public class SensorActivity extends AppCompatActivity {
     private TextView msg;
     private  TextView transmitView;
     private  Button acceptButton;
+    private Button cancelAction;
 
     private ProgressDialog mProgressDialog;
 
@@ -74,6 +75,13 @@ public class SensorActivity extends AppCompatActivity {
 
     //constants
     private final static int REQUEST_ENABLE_BT = 1;
+    private final static int REQUEST_PAUSE = 3;
+    private static int pause;
+    private final static int REQUEST_CONTINUE = 4;
+
+    private int CONNECTEDOFF = 0;
+    private int CONNECTEDON = 1;
+    private int connection;
 
     Handler bluetoothIn;
     final int handlerState = 0;
@@ -104,6 +112,7 @@ public class SensorActivity extends AppCompatActivity {
         rollView = (TextView) findViewById(R.id.roll);
         transmitView = (TextView) findViewById(R.id.transmitStatus);
         acceptButton = (Button) findViewById(R.id.accept);
+        cancelAction = (Button) findViewById(R.id.cancelButton);
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -149,18 +158,44 @@ public class SensorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (acceptButton.getText().equals(startTransfer)) {
+                    pause = REQUEST_CONTINUE;
                     new bluetoothAcceptTask().execute();
 
-                    // if acceptButton.getText().equals(stopTransfer)
+                    //
+                } else if (acceptButton.getText().equals(stopTransfer)){
+                    pause = REQUEST_PAUSE;
+                    transmitView.setText("");
+                    acceptButton.setText("Continue receiving?");
+
+                    //if (acceptButton.getText().equals("Continue Sending?")
                 } else {
-                    try {
-                        mConnectedThread.cancel();
-                        acceptButton.setText(startTransfer);
-                    } catch (Exception e) {
-
-                    }
+                    pause = REQUEST_CONTINUE;
+                    acceptButton.setText(stopTransfer);
                 }
+                cancelAction.setVisibility(View.VISIBLE);
 
+            }
+        });
+
+        cancelAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    mConnectedThread.cancel();
+                    mPressureView.setText("");
+                    mTempView.setText("");
+                    mLightView.setText("");
+                    mHumidityView.setText("");
+                    mMagneticView.setText("");
+                    azimuthView.setText("");
+                    pitchView.setText("");
+                    rollView.setText("");
+                    acceptButton.setText(startTransfer);
+                    cancelAction.setVisibility(View.INVISIBLE);
+                    connection = CONNECTEDOFF;
+                } catch (Exception e) {
+
+                }
             }
         });
 
@@ -231,6 +266,7 @@ public class SensorActivity extends AppCompatActivity {
 
 
         public void run() {
+
             byte[] buffer = new byte[1024];
             int bytes;
             int i = 0;
@@ -243,7 +279,7 @@ public class SensorActivity extends AppCompatActivity {
                     // Send the obtained bytes to the UI Activity via handler
                     System.out.println(i + "yes");
                     i++;
-                    if (bluetoothIn != null) {
+                    if (bluetoothIn != null && pause != REQUEST_PAUSE) {
                         bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
                         if (readMessage.equals("x")) {
                             System.out.println("message: " + readMessage);
@@ -275,7 +311,7 @@ public class SensorActivity extends AppCompatActivity {
 
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast toast =  Toast.makeText(SensorActivity.this, "Connection Failure ",
+                            Toast toast =  Toast.makeText(SensorActivity.this, connection == CONNECTEDON? "Connection Failure" : "Connection stopped!",
                                     Toast.LENGTH_LONG);
                             TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
                             toast.setGravity(Gravity.CENTER, 0, 0);
