@@ -3,12 +3,102 @@
 
     <item
         is-multidex="true"
+        jar="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_3e3127b87f20c8ef40d7446f60a3579bace00a72/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
         sha1="710834f10d92ccae06326c543217759cf2157f99">
         <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_5578acb1120304926404a7a430ecf4bf52cf1ad9/classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/673a44a005efbf83ddc0cbef7b225d240c09c492/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_02cc7a31e59e30e2b683784d3d8ced02e0ced34f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/25.3.1/support-annotations-25.3.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="bf8841d29fa39e077730e7a91222c2ce269fa7c9">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/support-annotations-25.3.1_7018ce78060ba22b0a65b25b7a6b4595b4a0d347.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/1c6d0453a34bcaf0dabbd3a7480dbd99ec937381/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_487ab70bdc3c0e4ac82d4497762a3a671d6442d6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/8f597ab550f3341f5fb1e455ce000862df17be17/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_9bf1446e12319cfd4d2f2755bf0c7f7789854d0f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/148ff688ffca3af9ab2237b94059821a1f09557d/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_5eed201d7475fd0b2334ede596a3c7a85eb7d317.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="1528e73d54577dc029cf77619dbcdf7b48f257cb">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_351cecfe9363cae923e468dc4028913b3716fdbc/classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/f4bdad5eac4a2158b95dc9213468925c3c01b121/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_c987dad868d8e7111f08896b8166728a9ab13f2c.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/e4aaaa193c84a2d740a958786632cd9a67fd6bb8/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_382e3e2f5ef1923afb8b69e1c67878d275afdfce.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/8bdec036ab8c1b863152c63da848614934855900/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_d8aac1124d5ef002799e29d326916dd4a7a94aa4.jar" />
     </item>
     <item
         is-multidex="true"
@@ -18,6 +108,24 @@
         revision="25.0.2"
         sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
         <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/solarTracker/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_dc90802c84c03f76a40c1a8b74718d8d7cc8b6b4/classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/11f9a5b93e2533005c1f756732d8b52d909e8120/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_031d156ddcf51d902383abc86b50004276bf42e1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/timothybaba/.android/build-cache/0e1abccb0af199c1870a3797d3fdcc1518e67d44/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="/Users/timothybaba/Documents/School_Work/Summer 2017/Side project/bluetoothServer-dataReader/app/build/intermediates/pre-dexed/debug/classes_a3c290dc97d97da9b562e26ff18aa9168d4b7e58.jar" />
     </item>
 
 </items>

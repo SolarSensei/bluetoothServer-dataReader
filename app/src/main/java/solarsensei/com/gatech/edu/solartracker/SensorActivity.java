@@ -58,9 +58,6 @@ public class SensorActivity extends AppCompatActivity {
 
     Handler bluetoothIn;
     final int handlerState = 0;
-    //private BluetoothServerSocket btServerSocket = null;
-    private StringBuilder recDataString = new StringBuilder();
-
     private BluetoothAdapter mBtAdapter;
 
     private ConnectedThread mConnectedThread;
@@ -98,52 +95,38 @@ public class SensorActivity extends AppCompatActivity {
                 if (msg.what == handlerState) {										//if message is what we want
                     String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
                     if (readMessage.length() > 0) {
-//                        if (readMessage.indexOf('B') > 0) {
-//                            mPressureView.setText(readMessage.substring(readMessage.indexOf('B') + 1, readMessage.indexOf('D')));
-//                        }
-//                        if (readMessage.indexOf('E') > 0) {
-//                            mTempView.setText(readMessage.substring(readMessage.indexOf('E') + 1, readMessage.indexOf('F')));
-//                        }
-//                        if (readMessage.indexOf('G') > 0) {
-//                            mLightView.setText(readMessage.substring(readMessage.indexOf('G') + 1, readMessage.indexOf('H')));
-//                        }
-//                        if (readMessage.indexOf('I') > 0) {
-//                            mHumidityView.setText(readMessage.substring(readMessage.indexOf('I') + 1, readMessage.indexOf('J')));
-//                        }
-//                        if (readMessage.indexOf('K') > 0) {
-//                            mMagneticView.setText(readMessage.substring(readMessage.indexOf('K') + 1, readMessage.indexOf('L')));
-//                        }
-//                        if (readMessage.indexOf('A') > 0) {
-//                            azimuthView.setText(readMessage.substring(readMessage.indexOf('A') + 1, readMessage.indexOf('P')));
-//                            pitchView.setText(readMessage.substring(readMessage.indexOf('P') + 1, readMessage.indexOf('R')));
-//                            rollView.setText(readMessage.substring(readMessage.indexOf('R') + 1));
-//                        }
-//
 
-
-
-                        char firstChar = readMessage.charAt(0);
-                        switch (firstChar) {
-                            case '1': mPressureView.setText(readMessage.substring(1));
-                                break;
-                            case '2': mTempView.setText(readMessage.substring(1));
-                                break;
-                            case '3': mLightView.setText(readMessage.substring(1));
-                                break;
-                            case '4': mHumidityView.setText(readMessage.substring(1));
-                                break;
-                            case '5': mMagneticView.setText(readMessage.substring(1));
-                                break;
-                            case '6':
-                                System.out.println(readMessage);
-                                azimuthView.setText(readMessage.substring(readMessage.indexOf('A') + 1, readMessage.indexOf('P')));
-                                pitchView.setText(readMessage.substring(readMessage.indexOf('P') + 1, readMessage.indexOf('R')));
-                                rollView.setText(readMessage.substring(readMessage.indexOf('R') + 1));
-//                                break;
-                            default:
-                                break;
+                         String[] splittedwords  = readMessage.split("\\s+");
+                        for (int i = 0; i < splittedwords.length; i++) {
+                            char firstChar = splittedwords[i].charAt(0);
+                            switch (firstChar) {
+                                case '1':
+                                    mPressureView.setText(splittedwords[i].substring(1));
+                                    break;
+                                case '2':
+                                    mTempView.setText(splittedwords[i].substring(1));
+                                    break;
+                                case '3':
+                                    mLightView.setText(splittedwords[i].substring(1));
+                                    break;
+                                case '4':
+                                    mHumidityView.setText(splittedwords[i].substring(1));
+                                    break;
+                                case '5':
+                                    mMagneticView.setText(splittedwords[i].substring(1));
+                                    break;
+                                case '6':
+                                    String[] segMent  =  splittedwords[i].split("p");
+                                    azimuthView.setText(segMent[0].substring(1));
+                                    pitchView.setText(segMent[1]);
+                                    rollView.setText(segMent[2]);
+                                    break;
+                                default:
+                                    break;
+                            }
 
                         }
+
 
                     }
                 }
@@ -266,7 +249,6 @@ public class SensorActivity extends AppCompatActivity {
 
             byte[] buffer = new byte[1024];
             int bytes;
-            int i = 0;
 
             // Keep looping to listen for received messages
             while (connectSocket != null) {
@@ -274,12 +256,10 @@ public class SensorActivity extends AppCompatActivity {
                     bytes = mmInStream.read(buffer);        	//read bytes from input buffer
                     String readMessage = new String(buffer, 0, bytes);
                     // Send the obtained bytes to the UI Activity via handler
-                    System.out.println(i + "yes");
-                    i++;
+                    System.out.println("message: " + readMessage);
                     if (bluetoothIn != null && pause != REQUEST_PAUSE) {
                         bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
                         if (readMessage.equals("x")) {
-                            System.out.println("message: " + readMessage);
                             runOnUiThread(new Runnable() {
                                 public void run() {
                                     Toast toast =  Toast.makeText(SensorActivity.this, "Accepted Connection!",
@@ -328,8 +308,6 @@ public class SensorActivity extends AppCompatActivity {
             try {
                 connectSocket.close();
             } catch (IOException e) {
-                // mProgressDialog.dismiss();
-                //Log.e(TAG, "Could not close the connect socket", e);
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Toast toast =  Toast.makeText(SensorActivity.this, "Could not close the connect socket",
