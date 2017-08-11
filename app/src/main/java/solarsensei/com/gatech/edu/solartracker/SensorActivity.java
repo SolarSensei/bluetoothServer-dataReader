@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.graphics.Color;
-import android.hardware.Sensor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,36 +34,31 @@ public class SensorActivity extends AppCompatActivity {
     private TextView azimuthView;
     private TextView pitchView;
     private TextView rollView;
+    private TextView directionView;
     private  TextView transmitView;
     private  Button acceptButton;
     private Button cancelAction;
-
     private ProgressDialog mProgressDialog;
 
 
-    //motion sensors
-    private Sensor mRotation;
-
     //constants
-    private final static int REQUEST_ENABLE_BT = 1;
     private final static int REQUEST_PAUSE = 3;
     private static int pause;
     private final static int REQUEST_CONTINUE = 4;
-
     private int CONNECTEDOFF = 0;
     private int CONNECTEDON = 1;
     private int connection;
-
-    Handler bluetoothIn;
-    final int handlerState = 0;
-    private BluetoothAdapter mBtAdapter;
-
-    private ConnectedThread mConnectedThread;
-
+    private final int handlerState = 0;
     private final String startTransfer = "START RECEIVING DATA";
     private final String stopTransfer = "STOP RECEIVING DATA";
-
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+
+    //Bluetooth accessories
+    private Handler bluetoothIn;
+    private BluetoothAdapter mBtAdapter;
+    private ConnectedThread mConnectedThread;
+
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -80,6 +73,7 @@ public class SensorActivity extends AppCompatActivity {
         azimuthView = (TextView) findViewById(R.id.azimuth);
         pitchView = (TextView) findViewById(R.id.pitch);
         rollView = (TextView) findViewById(R.id.roll);
+        directionView = (TextView) findViewById(R.id.direction);
         transmitView = (TextView) findViewById(R.id.transmitStatus);
         acceptButton = (Button) findViewById(R.id.accept);
         cancelAction = (Button) findViewById(R.id.cancelButton);
@@ -88,12 +82,10 @@ public class SensorActivity extends AppCompatActivity {
 
         acceptButton.setText(startTransfer);
 
-
-
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
-                if (msg.what == handlerState) {										//if message is what we want
-                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+                if (msg.what == handlerState) {	//if message is what we want
+                    String readMessage = (String) msg.obj;
                     if (readMessage.length() > 0) {
 
                          String[] splittedwords  = readMessage.split("\\s+");
@@ -105,15 +97,19 @@ public class SensorActivity extends AppCompatActivity {
                                     break;
                                 case '2':
                                     mTempView.setText(splittedwords[i].substring(1));
+                                    directionView.setText("Auto");
                                     break;
                                 case '3':
                                     mLightView.setText(splittedwords[i].substring(1));
+                                    directionView.setText("Auto");
                                     break;
                                 case '4':
                                     mHumidityView.setText(splittedwords[i].substring(1));
+                                    directionView.setText("Auto");
                                     break;
                                 case '5':
                                     mMagneticView.setText(splittedwords[i].substring(1));
+                                    directionView.setText("Auto");
                                     break;
                                 case '6':
                                     String[] segMent  =  splittedwords[i].split("p");
@@ -121,13 +117,23 @@ public class SensorActivity extends AppCompatActivity {
                                     pitchView.setText(segMent[1]);
                                     rollView.setText(segMent[2]);
                                     break;
+                                case 'R':
+                                    directionView.setText("R");
+                                    break;
+                                case 'L':
+                                    directionView.setText('L');
+                                    break;
+                                case 'U':
+                                    directionView.setText('U');
+                                    break;
+                                case 'D':
+                                    directionView.setText('D');
+                                    break;
+
                                 default:
                                     break;
                             }
-
                         }
-
-
                     }
                 }
             }
@@ -147,7 +153,6 @@ public class SensorActivity extends AppCompatActivity {
                     transmitView.setText("");
                     acceptButton.setText("Continue receiving?");
 
-                    //if (acceptButton.getText().equals("Continue Sending?")
                 } else {
                     pause = REQUEST_CONTINUE;
                     acceptButton.setText(stopTransfer);
@@ -181,21 +186,6 @@ public class SensorActivity extends AppCompatActivity {
 
 
     }
-//    @Override
-//    protected void onResume() {
-////        super.onResume();
-////        AcceptThread accept = new AcceptThread();
-////        accept.run();
-//    }
-
-    private void manageMyConnectedSocket(BluetoothSocket btSocket) {
-        mConnectedThread = new ConnectedThread(btSocket);
-        mConnectedThread.start();
-
-        //I send a character when resuming.beginning transmission to check device is connected
-        //If it is not an exception will be thrown in the write method and finish() will be called
-        mConnectedThread.run();
-    }
 
     private  class bluetoothAcceptTask extends AsyncTask<Void, Void, Void> {
 
@@ -213,7 +203,6 @@ public class SensorActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            // do tracks loading process here, don't update UI directly here because there is different mechanism for it
             AcceptThread accept = new AcceptThread();
             accept.run();
             return null;
@@ -222,8 +211,7 @@ public class SensorActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
 
-            // write display tracks logic here
-            SensorActivity.this.mProgressDialog.dismiss();  // dismiss dialog
+            SensorActivity.this.mProgressDialog.dismiss();
         }
     }
 
@@ -237,7 +225,7 @@ public class SensorActivity extends AppCompatActivity {
             this.connectSocket = socket;
 
             try {
-                //Create I/O streams for connection
+                //Create input stream for connection
                 tmpIn = socket.getInputStream();
             } catch (IOException e) { }
 
@@ -250,10 +238,10 @@ public class SensorActivity extends AppCompatActivity {
             byte[] buffer = new byte[1024];
             int bytes;
 
-            // Keep looping to listen for received messages
+            // Keeps looping to listen for received messages
             while (connectSocket != null) {
                 try {
-                    bytes = mmInStream.read(buffer);        	//read bytes from input buffer
+                    bytes = mmInStream.read(buffer);  //reads bytes from input buffer
                     String readMessage = new String(buffer, 0, bytes);
                     // Send the obtained bytes to the UI Activity via handler
                     System.out.println("message: " + readMessage);
@@ -303,7 +291,7 @@ public class SensorActivity extends AppCompatActivity {
             }
         }
 
-        //To do. Call this method when stop accepting data button is called.
+        //This method when stop accepting data button is called.
         public void cancel() {
             try {
                 connectSocket.close();
@@ -328,20 +316,16 @@ public class SensorActivity extends AppCompatActivity {
         private final BluetoothServerSocket mmServerSocket;
 
         public AcceptThread() {
-            // Use a temporary object that is later assigned to mmServerSocket
-            // because mmServerSocket is final.
             BluetoothServerSocket tmp = null;
             try {
-                // MY_UUID is the app's UUID string, also used by the client code.
                 tmp = mBtAdapter.listenUsingRfcommWithServiceRecord("SecureConnection", BTMODULEUUID);
             } catch (IOException e) {
-               // Log.e(TAG, "Socket's listen() method failed", e);
             }
             mmServerSocket = tmp;
         }
 
         public void run() {
-            BluetoothSocket socket = null;
+            BluetoothSocket socket;
             // Keep listening until exception occurs or a socket is returned.
             while (true) {
                 try {
@@ -378,8 +362,6 @@ public class SensorActivity extends AppCompatActivity {
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
-               // mProgressDialog.dismiss();
-                //Log.e(TAG, "Could not close the connect socket", e);
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Toast toast =  Toast.makeText(SensorActivity.this, "Could not close the connect socket",
@@ -393,6 +375,12 @@ public class SensorActivity extends AppCompatActivity {
                 });
             }
         }
+    }
+
+    private void manageMyConnectedSocket(BluetoothSocket btSocket) {
+        mConnectedThread = new ConnectedThread(btSocket);
+        mConnectedThread.start();
+        mConnectedThread.run();
     }
 }
 
