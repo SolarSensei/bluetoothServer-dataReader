@@ -218,33 +218,12 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/cancelButton"
-            android:visibility="gone"
-            android:text="cancel"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:layout_marginLeft="10dp"
-            android:id="@+id/accept"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-
-
-    </LinearLayout>
-
-
-
+    <Button
+        android:layout_marginLeft="10dp"
+        android:id="@+id/accept"
+        android:text="START RECEIVING DATA"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
